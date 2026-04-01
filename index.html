@@ -388,7 +388,8 @@ function status(state, txt) {
 }
 
 function gviz(sheet) {
-  return 'https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(sheet);
+  var h = sheet==='summary' ? '&headers=3' : '&headers=1';
+  return 'https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(sheet)+h;
 }
 
 function parseSheet(txt) {
@@ -410,7 +411,15 @@ function doLoad() {
     fetch(gviz('strategy_code')).then(function(r){return r.text();})
   ]).then(function(res){
     var sum=parseSheet(res[0]);
-    var ban=parseSheet(res[1]).filter(function(r){return r['openid'];});
+    var allBan=parseSheet(res[1]).filter(function(r){return r['openid'];});
+    var cfg0=getCfg();
+    var ks=cfg0.dKS?new Date(cfg0.dKS):null, ke=cfg0.dKE?new Date(cfg0.dKE):null;
+    if(ke) ke.setHours(23,59,59);
+    var ban=allBan.filter(function(r){
+      if(!ks||!ke) return true;
+      var d=parseDate(r['Ngày']); if(!d) return true;
+      return d>=ks && d<=ke;
+    });
     var sc=parseSheet(res[2]);
     var scMap={};
     sc.forEach(function(r){
@@ -468,7 +477,7 @@ function render(sumRows, bans, scMap) {
   var dauA=dauRows.map(function(r){return +r['DAU']||0;});
   var tranA=dauRows.map(function(r){return +r['Tổng Trận']||0;});
   var andA=dauRows.map(function(r){return +r['Android']||+r['Android %']||0;});
-  var iosA=dauRows.map(function(r){return +r['iOS']||+r['iOS %']||0;});
+  var iosA=dauRows.map(function(r){return +r['iOS']||+r['IOS']||+r['iOS %']||0;});
   var andPct=dauRows.map(function(r){return +r['Android %']||0;});
   var iosPct=dauRows.map(function(r){return +r['iOS %']||0;});
   var bombPct=dauRows.map(function(r){return +r['Tỷ lệ đặt bom %']||0;});
@@ -489,7 +498,7 @@ function render(sumRows, bans, scMap) {
   var rep5=dauRows.map(function(r){return +r['Report 5+']||0;});
   var rep10=dauRows.map(function(r){return +r['Report 10+']||0;});
   var andAbs=dauRows.map(function(r){return +r['Android']||Math.round((+r['Tổng Report']||0)*(+r['Android %']||40)/100);});
-  var iosAbs=dauRows.map(function(r){return +r['iOS']||Math.round((+r['Tổng Report']||0)*(+r['iOS %']||60)/100);});
+  var iosAbs=dauRows.map(function(r){return +r['iOS']||+r['IOS']||Math.round((+r['Tổng Report']||0)*(+r['iOS %']||60)/100);});
   var avgRep=avg(repTot), avgRep5=avg(rep5), avgRep10=avg(rep10);
   var avgAndAbs=avg(andAbs), avgIosAbs=avg(iosAbs);
 
