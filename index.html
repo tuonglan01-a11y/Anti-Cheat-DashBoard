@@ -388,8 +388,7 @@ function status(state, txt) {
 }
 
 function gviz(sheet) {
-  var h = sheet==='summary' ? '&headers=3' : '&headers=1';
-  return 'https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(sheet)+h;
+  return 'https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(sheet)+'&range=A3:N200';
 }
 
 function parseSheet(txt) {
