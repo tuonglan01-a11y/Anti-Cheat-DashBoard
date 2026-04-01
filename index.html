@@ -461,7 +461,7 @@ function render(sumRows, bans, scMap) {
   var kiLong = fmtD(cfg.dKS)+' – '+fmtD(cfg.dKE);
 
   // DAU rows: filter rows that have Ngày + DAU
-  var dauRows = sumRows.filter(function(r){ return r['Ngày'] && +r['DAU']>1000; });
+  var dauRows = sumRows.filter(function(r){ return r['Ngày'] && r['DAU']!==null && !isNaN(+r['DAU']) && +r['DAU']>0; });
 
   // ── Section 00: DAU ──────────────────────────────────────────────────────
   var dates=dauRows.map(function(r){return dShort(r['Ngày']);});
@@ -469,7 +469,7 @@ function render(sumRows, bans, scMap) {
   var tranA=dauRows.map(function(r){return +r['Tổng Trận']||0;});
   var andA=dauRows.map(function(r){return +r['Android']||+r['Android %']||0;});
   var iosA=dauRows.map(function(r){return +r['iOS']||+r['iOS %']||0;});
-  var andPct=dauRows.map(function(r){return +r['Android %']||(andA[0]<200?(+r['Android %']||0):andA[dauRows.indexOf(r)]/(dauA[dauRows.indexOf(r)]||1)*100);});
+  var andPct=dauRows.map(function(r){return +r['Android %']||0;});
   var iosPct=dauRows.map(function(r){return +r['iOS %']||0;});
   var bombPct=dauRows.map(function(r){return +r['Tỷ lệ đặt bom %']||0;});
   var maxDau=Math.max(...dauA), minTran=Math.min(...tranA);
